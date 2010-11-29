@@ -62,12 +62,69 @@ class ENSOGraphWidget extends WP_Widget {
 		endif;
 	}
 
+	static function draw_graph( ) {
+		$enso_array = $enso_array = get_option( 'oac_current_enso_data', array());
+		if( count( $enso_array ) != 0 ) {
+			echo "<script type=\"text/javascript\">\n";
+			echo "\tneutral = ".$enso_array['neutral_prediction'].";\n";
+			echo "\telnino  = ".$enso_array['el_nino_prediction'].";\n";
+			echo "\tlanina  = ".$enso_array['la_nina_prediction'].";\n";
+			$script = <<<DRAW_GRAPH
+	data = [neutral,elnino,lanina];
+	legend = ["Neutral (%%)", "El Ni\u00f1o (%%)", "La Ni\u00f1a (%%)"];
+	colors = ["#0f6", "#f66", "#0cf"];
+	
+	x_slice = jQuery("#enso_prediction_chart").width()/5;
+	diameter = (x_slice);
+
+	var r = Raphael("enso_prediction_chart", x_slice*5, diameter*2);
+	counter = 0;
+	true_value = null;
+
+	for( index = 0; index < data.length; index++) {
+		if( data[index] != 0 ) {
+			counter++;
+			true_value = index;
+		}
+		if ( counter > 1 ) {
+			break;
+		}
+	}
+
+	switch( counter ) {
+		case 0:
+			jQuery("#enso_prediction_chart").html('No data available');
+			break;
+		case 1:
+			data = [data[true_value]];
+			legend = [legend[true_value]];
+			colors = [colors[true_value]];
+		default:
+			var pie = r.g.piechart((x_slice*4)-5, diameter, diameter-5, data,
+						{ legend: legend,
+						  legendpos: "west",
+						  colors: colors,
+						  stroke: "#fff",
+						  sort: false,
+						  angle: 90,
+						  ignoreZeros: true,
+						});
+			break;
+	}
+
+</script>
+
+DRAW_GRAPH;
+	echo $script;
+		}
+	}
+
 	function ENSOGraphWidget() {
 		$enso_array = array();
 		$new_data   = false; // Set to true if new data is retrieved
 		
 		// Should I do my checks here or not?
-		if( $enso_array = get_option( 'oac_current_enso_data' ) ) {
+		if( $enso_array = get_option( 'oac_current_enso_data', false ) ) {
 			// Check the timestamp (if there is one) for freshness (2 weeks)
 			if( strtotime( '+2 weeks', $enso_array['last_updated'] ) < strtotime( 'now' ) ) {
 				// If there isn't an error getting the ENSO data, save it otherwise, keep our old data (the administrator got an email anyways)
@@ -82,6 +139,8 @@ class ENSOGraphWidget extends WP_Widget {
 			$enso_array = ENSOGraphWidget::lookup_enso();
 			if( $enso_array != false ) {
 				$new_data = true;
+			} else {
+				$enso_array = array();
 			}
 		} //if ( get_option ... )
 		if( $new_data )
@@ -89,13 +148,12 @@ class ENSOGraphWidget extends WP_Widget {
 
 		if ( count( $enso_array ) != 0 ) {
 			// Enqueue all the scripts necessary to render the pie chart
-			wp_enqueue_script('');
-			wp_enqueue_script('');
-			wp_enqueue_script('');
-			wp_enqueue_script('');
-
+			wp_enqueue_script('raphael', plugins_url( 'js/raphael-min.js', __FILE__ ) );
+			wp_enqueue_script('graphael', plugins_url( 'js/graphael/g.raphael-min.js', __FILE__ ) );
+			wp_enqueue_script('gpie', plugins_url( 'js/graphael/g.pie-min.js', __FILE__ ) );
+			wp_enqueue_script('jquery');
 		}
-		parent::WP_Widget( false, $name = 'ENSOGraphWidget' );
+		parent::WP_Widget( false, $name = 'ENSO Graph' );
 	}
 	
 	function widget( $args, $instance ) {
@@ -105,7 +163,6 @@ class ENSOGraphWidget extends WP_Widget {
 		echo $before_title.'ENSO Prediction'.$after_title; 
 		
 		if( $enso_array ) {
-			
 			echo 'Current Phase: <em>'.$enso_array['current_phase']."</em><br />\n";
 			echo "Current Prediction Period:<br />\n<em>".$enso_array['current_period']."</em><br />\n";
 			echo "<div id=\"enso_prediction_chart\"></div>\n";
@@ -118,6 +175,8 @@ class ENSOGraphWidget extends WP_Widget {
 
 function ENSOGraphInit() {
 	register_widget( 'ENSOGraphWidget' );
+} //function ENSOGraphInit
 
 add_action( 'widgets_init', 'ENSOGraphInit' );
+add_action( 'wp_print_footer_scripts', 'ENSOGraphWidget::draw_graph' );
 ?>
