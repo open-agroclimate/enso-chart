@@ -148,10 +148,8 @@ DRAW_GRAPH;
 
 		if ( count( $enso_array ) != 0 ) {
 			// Enqueue all the scripts necessary to render the pie chart
-			wp_enqueue_script('raphael', plugins_url( 'js/raphael-min.js', __FILE__ ) );
-			wp_enqueue_script('graphael', plugins_url( 'js/graphael/g.raphael-min.js', __FILE__ ) );
-			wp_enqueue_script('gpie', plugins_url( 'js/graphael/g.pie-min.js', __FILE__ ) );
-			wp_enqueue_script('jquery');
+			wp_enqueue_script( 'grpie' );
+			wp_enqueue_script( 'jquery');
 		}
 		parent::WP_Widget( false, $name = 'ENSO Graph' );
 	}
@@ -177,6 +175,6 @@ function ENSOGraphInit() {
 	register_widget( 'ENSOGraphWidget' );
 } //function ENSOGraphInit
 
-add_action( 'widgets_init', 'ENSOGraphInit' );
+add_action( 'widgets_init', 'ENSOGraphInit' );  // Needed for load order issues
 add_action( 'wp_print_footer_scripts', 'ENSOGraphWidget::draw_graph' );
 ?>
