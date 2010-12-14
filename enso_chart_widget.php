@@ -12,20 +12,29 @@
 class ENSOGraphWidget extends WP_Widget {
 	static function lookup_enso() {
 		$enso_array = array();
+		$true_period = '';
 		
 		// Retrieve the data from IRI	
 		$enso_uri = 'http://iri.columbia.edu/climate/ENSO/currentinfo/figure3.html';
 		$raw_html = wp_remote_fopen( $enso_uri );
 		
 		// Parse the table with the prediction data
-		$result = preg_match("/<tr><td>(?P<prediction_date>[JFMASOND]{3}\ [0-9]{4})<\/td><td>(?P<lanina>[0-9\. ]{1,4})%<\/td><td>(?P<neutral>[0-9\. ]{1,4})%<\/td><td>(?P<elnino>[0-9\. ]{1,4})%<\/td><\/tr>/", $raw_html, $parsed_data);
+		$result = preg_match_all("/<tr><td>(?P<prediction_date>[JFMASOND]{3}\ [0-9]{4})<\/td><td>(?P<lanina>[0-9\. ]{1,4})%<\/td><td>(?P<neutral>[0-9\. ]{1,4})%<\/td><td>(?P<elnino>[0-9\. ]{1,4})%<\/td><\/tr>/", $raw_html, $parsed_data);
 		
 		// Return FALSE if any errors, otherwise return the $enso_array
 		if( $result ):
+			$mon_lookup = array();
+			$mon_lookup[] = substr(date( "M", strtotime('now')), 0, 1);
+			$mon_lookup[] = substr(date( "M", strtotime('+1 month')), 0, 1);
+			$mon_lookup[] = substr(date( "M", strtotime('+2 months')), 0, 1).' '.date("Y", strtotime('+2 months'));
+
+			$true_period = implode('', $mon_lookup);
+			$mon_index = array_search($true_period, $parsed_data['prediction_date']);
+			if( $mon_index === false ) return false;
 			// If we get a match back, then store this information in the database as well as update the current timestamp.
-			$enso_array['la_nina_prediction'] = floatval( $parsed_data['lanina'] );
-			$enso_array['neutral_prediction'] = floatval( $parsed_data['neutral'] );
-			$enso_array['el_nino_prediction'] = floatval( $parsed_data['elnino'] );
+			$enso_array['la_nina_prediction'] = floatval( $parsed_data['lanina'][$mon_index] );
+			$enso_array['neutral_prediction'] = floatval( $parsed_data['neutral'][$mon_index] );
+			$enso_array['el_nino_prediction'] = floatval( $parsed_data['elnino'][$mon_index] );
 			
 			// Guess the current phase based on the maximum value of the above
 			$current_phase = array_search( max( $enso_array ), $enso_array );
@@ -46,7 +55,7 @@ class ENSOGraphWidget extends WP_Widget {
 			
 			// Find the current prediciton period ( localized )
 			$month_list    = 'JFMAMJJASONDJF';
-			$pred_month_index  = stripos( $month_list, substr( $parsed_data['prediction_date'], 0, 3 ) ) + 1;
+			$pred_month_index  = stripos( $month_list, substr( $true_period, 0, 3 ) ) + 1;
 			$current_period = array();
 			for( $i=0; $i < 3; $i++ ) {
 				$current_period[] = date_i18n( 'M', strtotime( ( ( $pred_month_index + $i ) % 12 ).'/1/'.date( 'Y' ) ) );
