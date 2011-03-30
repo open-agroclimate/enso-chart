@@ -167,10 +167,10 @@ DRAW_GRAPH;
 		extract( $args );
 		$enso_array = get_option( 'oac_current_enso_data', false );
 		echo $before_widget;
-		echo $before_title.'ENSO Prediction'.$after_title; 
+		echo $before_title.__( 'ENSO Prediction', 'ensowidget' ).$after_title; 
 		
 		if( $enso_array ) {
-			echo "Current Prediction Period:<br />\n<em>".$enso_array['current_period']."</em><br />\n";
+            echo __( "Current Prediction Period", 'ensowidget' ).":<br />\n<em>".$enso_array['current_period']."</em><br />\n";
 			echo "<div id=\"enso_prediction_chart\"></div>\n";
 		} else {
 			echo "No data available.";
@@ -180,9 +180,12 @@ DRAW_GRAPH;
 } // class ENSOGraphWidget
 
 function ENSOGraphInit() {
-	register_widget( 'ENSOGraphWidget' );
+    register_widget( 'ENSOGraphWidget' );
 } //function ENSOGraphInit
 
 add_action( 'widgets_init', 'ENSOGraphInit' );  // Needed for load order issues
 add_action( 'wp_print_footer_scripts', 'ENSOGraphWidget::draw_graph' );
+$plugin_dir = basename( dirname( __FILE__ ) );
+load_plugin_textdomain( 'ensowidget', null, $plugin_dir . '/languages' );
+
 ?>
