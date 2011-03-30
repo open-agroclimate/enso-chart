@@ -170,7 +170,6 @@ DRAW_GRAPH;
 		echo $before_title.'ENSO Prediction'.$after_title; 
 		
 		if( $enso_array ) {
-			echo 'Current Phase: <em>'.$enso_array['current_phase']."</em><br />\n";
 			echo "Current Prediction Period:<br />\n<em>".$enso_array['current_period']."</em><br />\n";
 			echo "<div id=\"enso_prediction_chart\"></div>\n";
 		} else {
