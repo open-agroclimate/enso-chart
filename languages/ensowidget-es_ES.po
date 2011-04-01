@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Open AgroClimate: ENSO Chart Widget\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-03-30 17:04-0500\n"
-"PO-Revision-Date: 2011-03-30 17:04-0500\n"
+"PO-Revision-Date: 2011-04-01 09:52-0500\n"
 "Last-Translator: Christopher Villalobos <cvillalobos@ufl.edu>\n"
 "Language-Team: Open AgroClimate Project <open@agroclimate.org>\n"
 "MIME-Version: 1.0\n"
@@ -20,25 +20,25 @@ msgstr ""
 
 #: ../enso_chart_widget.php:43
 msgid "La Ni&#241;a"
-msgstr ""
+msgstr "La Ni&ntilde;a"
 
 #: ../enso_chart_widget.php:46
 msgid "Neutral"
-msgstr ""
+msgstr "Neutral"
 
 #: ../enso_chart_widget.php:49
 msgid "El Ni&#241;o"
-msgstr ""
+msgstr "El Ni&ntilde;o"
 
 #: ../enso_chart_widget.php:52
 msgid "Unknown"
-msgstr ""
+msgstr "Desconocido"
 
 #: ../enso_chart_widget.php:170
 msgid "ENSO Prediction"
-msgstr ""
+msgstr "Predicci&oacute;n de ENSO"
 
 #: ../enso_chart_widget.php:173
 msgid "Current Prediction Period"
-msgstr ""
+msgstr "Periodo de Predicci&oacute;n Corriente"
 
