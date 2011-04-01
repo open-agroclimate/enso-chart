@@ -83,44 +83,45 @@ class ENSOGraphWidget extends WP_Widget {
 	legend = ["Neutral (%%)", "El Ni\u00f1o (%%)", "La Ni\u00f1a (%%)"];
 	colors = ["#0f6", "#f66", "#0cf"];
 	
-	x_slice = jQuery("#enso_prediction_chart").width()/5;
-	diameter = (x_slice);
+	if( jQuery("#enso_prediction_chart").length !== 0 ) {
+	    x_slice = jQuery("#enso_prediction_chart").width()/5;
+    	diameter = (x_slice);
 
-	var r = Raphael("enso_prediction_chart", x_slice*5, diameter*2);
-	counter = 0;
-	true_value = null;
+    	var r = Raphael("enso_prediction_chart", x_slice*5, diameter*2);
+    	counter = 0;
+    	true_value = null;
 
-	for( index = 0; index < data.length; index++) {
-		if( data[index] != 0 ) {
-			counter++;
-			true_value = index;
-		}
-		if ( counter > 1 ) {
-			break;
-		}
-	}
+    	for( index = 0; index < data.length; index++) {
+    		if( data[index] != 0 ) {
+    			counter++;
+    			true_value = index;
+    		}
+    		if ( counter > 1 ) {
+    			break;
+    		}
+    	}
 
-	switch( counter ) {
-		case 0:
-			jQuery("#enso_prediction_chart").html('No data available');
-			break;
-		case 1:
-			data = [data[true_value]];
-			legend = [legend[true_value]];
-			colors = [colors[true_value]];
-		default:
-			var pie = r.g.piechart((x_slice*4)-5, diameter, diameter-5, data,
-						{ legend: legend,
-						  legendpos: "west",
-						  colors: colors,
-						  stroke: "#fff",
-						  sort: false,
-						  angle: 90,
-						  ignoreZeros: true,
-						});
-			break;
-	}
-
+    	switch( counter ) {
+    		case 0:
+    			jQuery("#enso_prediction_chart").html('No data available');
+    			break;
+    		case 1:
+    			data = [data[true_value]];
+    			legend = [legend[true_value]];
+    			colors = [colors[true_value]];
+    		default:
+    			var pie = r.g.piechart((x_slice*4)-5, diameter, diameter-5, data,
+    						{ legend: legend,
+    						  legendpos: "west",
+    						  colors: colors,
+    						  stroke: "#fff",
+    						  sort: false,
+    						  angle: 90,
+    						  ignoreZeros: true,
+    						});
+    			break;
+    	}
+    }
 </script>
 
 DRAW_GRAPH;
