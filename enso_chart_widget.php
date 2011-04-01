@@ -10,6 +10,8 @@
  */
 
 class ENSOGraphWidget extends WP_Widget {
+    public static $used = false;
+    
 	static function lookup_enso() {
 		$enso_array = array();
 		$true_period = '';
@@ -72,19 +74,19 @@ class ENSOGraphWidget extends WP_Widget {
 	}
 
 	static function draw_graph( ) {
-		$enso_array = $enso_array = get_option( 'oac_current_enso_data', array());
-		if( count( $enso_array ) != 0 ) {
-			echo "<script type=\"text/javascript\">\n";
-			echo "\tneutral = ".$enso_array['neutral_prediction'].";\n";
-			echo "\telnino  = ".$enso_array['el_nino_prediction'].";\n";
-			echo "\tlanina  = ".$enso_array['la_nina_prediction'].";\n";
-			$script = <<<DRAW_GRAPH
-	data = [neutral,elnino,lanina];
-	legend = ["Neutral (%%)", "El Ni\u00f1o (%%)", "La Ni\u00f1a (%%)"];
-	colors = ["#0f6", "#f66", "#0cf"];
+	    if( self::$used ) {
+	    	$enso_array = $enso_array = get_option( 'oac_current_enso_data', array());
+    		if( count( $enso_array ) != 0 ) {
+    			echo "<script type=\"text/javascript\">\n";
+    			echo "\tneutral = ".$enso_array['neutral_prediction'].";\n";
+    			echo "\telnino  = ".$enso_array['el_nino_prediction'].";\n";
+    			echo "\tlanina  = ".$enso_array['la_nina_prediction'].";\n";
+    			$script = <<<DRAW_GRAPH
+    	data = [neutral,elnino,lanina];
+    	legend = ["Neutral (%%)", "El Ni\u00f1o (%%)", "La Ni\u00f1a (%%)"];
+    	colors = ["#0f6", "#f66", "#0cf"];
 	
-	if( jQuery("#enso_prediction_chart").length !== 0 ) {
-	    x_slice = jQuery("#enso_prediction_chart").width()/5;
+        x_slice = jQuery("#enso_prediction_chart").width()/5;
     	diameter = (x_slice);
 
     	var r = Raphael("enso_prediction_chart", x_slice*5, diameter*2);
@@ -121,12 +123,12 @@ class ENSOGraphWidget extends WP_Widget {
     						});
     			break;
     	}
-    }
-</script>
+    </script>
 
 DRAW_GRAPH;
 	echo $script;
 		}
+	}
 	}
 
 	function ENSOGraphWidget() {
@@ -165,6 +167,7 @@ DRAW_GRAPH;
 	}
 	
 	function widget( $args, $instance ) {
+	    self::$used = true;
 		extract( $args );
 		$enso_array = get_option( 'oac_current_enso_data', false );
 		echo $before_widget;
